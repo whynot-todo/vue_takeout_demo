@@ -35,7 +35,24 @@ export default new Vuex.Store({
     },
     RECEIVE_SHOP_RATINGS(state, { shopRatings }) {
       state.shopRatings = shopRatings
-  },
+    },
+    Add_CART_COUNT(state, { food }) {
+      if (!food.count) {
+        Vue.set(food, 'count', 1)
+        state.cartFoods.push(food)
+
+      } else {
+        food.count++
+      }
+    },
+    DECREMENT_CART_COUNT(state, { food }) {
+      if (food.count) {
+        food.count--
+        if (food.count === 0) {
+          state.cartFoods.splice(state.cartFoods.indexOf(food), 1)
+        }
+      }
+    },
   },
   actions: {
     async getAddress({ commit, state }) {
@@ -91,10 +108,18 @@ export default new Vuex.Store({
     },
     updateCount({ commit }, { isAdd, food }) {
       if (isAdd) {
-        commit(Add_CART_COUNT, { food })
+        commit('Add_CART_COUNT', { food })
       } else {
-        commit(DECREMENT_CART_COUNT, { food })
+        commit('DECREMENT_CART_COUNT', { food })
       }
+    },
+  },
+  getters: {
+    totalCount(state) {
+      return state.cartFoods.reduce((pre, food) => pre + food.count, 0)
+    },
+    totalPrice(state) {
+      return state.cartFoods.reduce((pre, food) => pre + food.count * food.price, 0)
     },
   },
   modules: {
