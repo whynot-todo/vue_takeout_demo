@@ -7,3 +7,6 @@ export const reqShops = (longitude, latitude) => ajax('/shops', {longitude, lati
 export const reqShopInfo = () => ajax('/info')
 export const reqShopFoods = () => ajax('/goods')
 export const reqShopRatings = () => ajax('/ratings')
+
+/* 用户名和密码登录 */
+export const reqPwdLogin = ({username, password, captcha}) => ajax('/login_pwd', {username, password, captcha}, 'POST')

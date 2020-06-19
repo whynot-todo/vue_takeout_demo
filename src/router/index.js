@@ -9,6 +9,7 @@ import Shop from '@/views/Shop/Shop'
 import ShopGoods from '@/views/Shop/ShopGoods/ShopGoods'
 import ShopInfo from '@/views/Shop/ShopInfo/ShopInfo'
 import ShopRatings from '@/views/Shop/ShopRatings/ShopRatings'
+import Login from '@/views/Login/Login'
 
 Vue.use(VueRouter)
 
@@ -66,6 +67,10 @@ const routes = [
                 redirect: '/shop/goods'
             },
         ]
+    },
+    {
+        path: '/login',
+        component: Login,
     },
 ]
 
