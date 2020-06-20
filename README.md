@@ -1,19 +1,14 @@
 # vue-takeout-demo
 
-## Project setup
-```
+### 1 打开根目录
+
+```bash
 npm install
 ```
-
-### Compiles and hot-reloads for development
+### 2 打开根目录下的`takeout_sever`
+```bash
+npm install
 ```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### 3 其他说明
+1. 你可以自己配置`scripts`命令
+2. 也可以在各个项目下，把项目运行起来

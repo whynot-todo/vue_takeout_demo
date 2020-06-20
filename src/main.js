@@ -4,9 +4,9 @@ import router from './router'
 import store from './store'
 import './assets/css/reset.css'
 import './mock/mockServer'
-import { Button } from 'vant'
+import { Button,Toast  } from 'vant'
 
-Vue.use(Button)
+Vue.use(Button).use(Toast)
 
 Vue.config.productionTip = false
 

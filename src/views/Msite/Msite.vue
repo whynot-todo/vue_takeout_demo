@@ -4,7 +4,12 @@
             <div slot="left">
                 <i class="iconfont icon-sousuo"></i>
             </div>
-            <div slot="right">登录|注册</div>
+            <div slot="right">
+                <router-link :to="userInfo._id?'/userinfo':'/login'">
+                    <span v-if="!userInfo._id">登录|注册</span>
+                    <span v-else><i class="iconfont icon-person"></i></span>
+                </router-link>
+            </div>
         </header-top>
         <div class="wrapper">
             <div>
@@ -56,7 +61,7 @@ export default {
         };
     },
     computed: {
-        ...mapState(["address", "categorys"]),
+        ...mapState(["address", "categorys","userInfo"]),
         categorysArr() {
             const { categorys } = this;
             // 准备空的2维数组
@@ -109,6 +114,10 @@ export default {
 
 <style lang="less" scoped>
 @import "../../assets/less/mixin";
+.icon-person{
+    color: #fff;
+    font-size: 20px !important;
+}
 .wrapper {
     position: fixed;
     width: 100%;

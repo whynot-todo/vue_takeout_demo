@@ -1,18 +1,18 @@
 <template>
     <div class="profile">
         <header-top title="我的"></header-top>
-        <router-link to="/login">
+        <router-link :to="userInfo._id ? '/userinfo': '/login'">
             <section class="userinfo">
                 <div class="avatar">
                     <i class="iconfont icon-person"></i>
                 </div>
                 <div class="userinfo_area">
-                    <p class="username">123465</p>
+                    <p class="username">{{userInfo._id? userInfo.username:'请登录'}}</p>
                     <p class="user_phone">
                         <span class="phone_icon">
                             <i class="iconfont icon-shouji icon-mobile"></i>
                         </span>
-                        <span>暂无绑定手机号</span>
+                        <span>{{userInfo? userInfo.phone : '暂无绑定手机号'}}</span>
                     </p>
                 </div>
                 <i class="iconfont icon-jiantou1"></i>
@@ -72,19 +72,42 @@
                 </div>
             </a>
         </section>
-        <section class="logout-btm">
-            <van-button style="width:100%" type="danger">退出</van-button>
+        <section class="logout-btm" v-if="userInfo._id">
+            <van-button style="width:100%" type="danger" @click="logout">退出</van-button>
         </section>
     </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
+import { Dialog, Toast } from "vant";
 import HeaderTop from "@/components/HeaderTop";
 /* 局部注册抓奸 */
 export default {
     name: "Msite",
+    computed: {
+        ...mapState(["userInfo"])
+    },
+    methods: {
+        logout() {
+            Dialog.confirm({
+                title: "退出",
+                message: "确定退出吗？"
+            })
+                .then(() => {
+                    // on confirm
+                    this.$store.dispatch("logout");
+                    Toast.success("退出成功");
+                })
+                .catch(() => {
+                    // on cancel
+                    Toast.fail("退出失败");
+                });
+        }
+    },
     components: {
-        HeaderTop
+        HeaderTop,
+        [Dialog.Component.name]: Dialog.Component
     }
 };
 </script>

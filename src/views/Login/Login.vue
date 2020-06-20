@@ -11,10 +11,16 @@
         <section :class="{on:loginWay===false}" class="login_area_phone">
             <div class="login_input">
                 <section class="section_input">
-                    <input type="text" placeholder="手机号" />
+                    <input v-model="phone" type="text" placeholder="手机号" />
+                    <button
+                        :disabled="!rightPhone"
+                        :class="{right_phone:rightPhone}"
+                        @click="getCode"
+                        class="switch_btn sms_btn"
+                    >{{computedTime>0?`已发送 ${computedTime} s`:'获取验证码'}}</button>
                 </section>
                 <section class="section_input">
-                    <input type="text" placeholder="验证码" />
+                    <input v-model="code" type="text" placeholder="验证码" />
                 </section>
             </div>
             <div class="login_hint">
@@ -45,10 +51,10 @@
                         <span>{{showPwd?'...':'abc'}}</span>
                     </div>
                 </section>
-            <section class="section_input">
-                <input v-model="captcha" class="last_input" type="text" placeholder="验证码" />
-                <img ref="captcha" src="http://localhost:3000/captcha" @click="getCaptcha" alt />
-            </section>
+                <section class="section_input">
+                    <input v-model="captcha" class="last_input" type="text" placeholder="验证码" />
+                    <img ref="captcha" src="http://localhost:3000/captcha" @click="getCaptcha" alt />
+                </section>
             </div>
         </section>
         <section class="login_btn">
@@ -59,30 +65,95 @@
 </template>
 
 <script>
-import {reqPwdLogin} from '../../api/index.js'
+import { reqPwdLogin, reqSendCode, reqSmsLogin } from "../../api/index.js";
+import { Toast } from "vant";
 export default {
     data() {
         return {
             showPwd: true,
-            loginWay: true,
-            username:"",
-            password:"",
-            captcha:""
+            loginWay: true, // ture代表手机登录，false代表密码登录
+            username: "",
+            password: "",
+            captcha: "",
+            computedTime: 0, //发送验证码的计时
+            phone: "", //手机号
+            code: "" //短信验证码
         };
     },
+    computed: {
+        rightPhone() {
+            console.log(this.phone);
+            /* 检验手机号是否符合规范 */
+            return /^1\d{10}$/.test(this.phone);
+        }
+    },
     methods: {
+        async getCode() {
+            /* 如果没有计时 */
+            if (!this.computedTime) {
+                /* 启动倒计时 */
+                this.computedTime = 30;
+                this.intervalId = setInterval(() => {
+                    this.computedTime--;
+                    /* 倒计时为0的时候 */
+                    if (this.computedTime < 0) {
+                        clearInterval(this.intervalId);
+                    }
+                }, 1000);
+            }
+            const result = await reqSendCode(this.phone);
+            if (result.code === 1) {
+                Toast.fail("短信验证码发送失败");
+                /* 停止计时 */
+                if (this.computedTime) {
+                    this.computedTime = 0;
+                    clearInterval(this.intervalId);
+                    /* 保险起见 */
+                    this.intervalId = null;
+                }
+            }
+        },
         TogloginWay(flag) {
             this.loginWay = flag;
         },
-        async login () {
-            const {username,password,captcha} = this
-            console.log(username)
-            const result = await reqPwdLogin({username,password,captcha})
-            console.log(result)
+        async login() {
+            let result;
+            if (this.loginWay) {
+                /* 手机登录 */
+                const { phone, code, rightPhone } = this;
+                /* 表单验证 */
+                if (!rightPhone) {
+                    Toast("手机号不正确");
+                    return;
+                } else if (!/^\d{6}$/.test(code)) {
+                    Toast("验证必须是6位数字");
+                    return;
+                }
+                result = await reqSmsLogin(phone, code);
+            } else {
+                const { username, password, captcha } = this;
+                const result = await reqPwdLogin({
+                    username,
+                    password,
+                    captcha
+                });
+            }
+            // 停止计时
+            if (this.computeTime) {
+                this.computeTime = 0;
+                clearInterval(this.intervalId);
+                this.intervalId = undefined;
+            }
+            if (result.code === 0) {
+                const user = result.data;
+                /* 同步保存到vux中 */
+                this.$store.dispatch("recordUser", user);
+                this.$router.replace("/profile");
+            }
         },
         getCaptcha() {
             this.$refs.captcha.src =
-                "http://localhost:4000/captcha?time" + Date.now()
+                "http://localhost:3000/captcha?time" + Date.now();
         }
     }
 };
@@ -140,6 +211,9 @@ export default {
     .section_input {
         position: relative;
         margin-bottom: 15px;
+        .right_phone {
+            color: #000 !important;
+        }
         /* 切换按钮处理 */
         .switch_btn {
             width: 30px;
@@ -184,6 +258,20 @@ export default {
             }
             span {
                 float: right;
+            }
+        }
+        .sms_btn {
+            background-color: transparent;
+            width: auto;
+            height: auto;
+            font-size: 16px;
+            white-space: nowrap;
+            color: #ccc;
+            border: none;
+            padding: 4px 4px;
+            &:focus {
+                border: 1px solid #02a774;
+                outline: 1px #02a774;
             }
         }
         /* 调整验证码位置 */
