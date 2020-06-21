@@ -3,7 +3,7 @@
         <div v-if="shops.length">
             <section class="shop" v-for="(shop,index) in shops" :key="index" @click="toShop">
                 <section class="shop-left">
-                    <img src alt />
+                    <img :src="shop.image_path" alt />
                 </section>
                 <section class="shop-middle">
                     <div>
@@ -64,7 +64,10 @@ export default {
 	.shop-left {
 		width: 70px;
 		height: 70px;
-		border: 1px solid black;
+		img{
+			width: 100%;
+			height: 100%;
+		}
 	}
 	.shop-middle {
 		flex: 1;

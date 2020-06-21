@@ -18,3 +18,5 @@ export const reqSendCode = (phone) => ajax('/sendcode',{phone})
 export const reqSmsLogin = (phone, code) => ajax('/login_sms', {phone, code}, 'POST')
 /* 请求用户信息，用于免登陆 */
 export const reqUserInfo = () => ajax('/userinfo')
+/* 搜索商户 */
+export const reqSearchShop = (geohash, keyword) => ajax('/search_shops', {geohash, keyword})

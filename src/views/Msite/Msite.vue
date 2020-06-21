@@ -6,7 +6,7 @@
             </div>
             <div slot="right">
                 <router-link :to="userInfo._id?'/userinfo':'/login'">
-                    <span v-if="!userInfo._id">登录|注册</span>
+                    <span v-if="!userInfo._id" class="login">登录|注册</span>
                     <span v-else><i class="iconfont icon-person"></i></span>
                 </router-link>
             </div>
@@ -114,6 +114,9 @@ export default {
 
 <style lang="less" scoped>
 @import "../../assets/less/mixin";
+.login{
+    color: #fff;
+}
 .icon-person{
     color: #fff;
     font-size: 20px !important;

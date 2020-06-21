@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { reqAddress, reqFoodCategorys, reqShops, reqShopRatings, reqShopInfo, reqShopFoods, reqLogout, reqUserInfo } from "../api"
+import { reqAddress, reqFoodCategorys, reqShops, reqShopRatings, reqShopInfo, reqShopFoods, reqLogout, reqUserInfo, reqSearchShop } from "../api"
 
 
 Vue.use(Vuex)
@@ -16,7 +16,8 @@ export default new Vuex.Store({
         shopInfo: {},
         cartFoods: [],
         shopRatings: [],
-        userInfo: {}
+        userInfo: {},
+        searchShops:[]
     },
     mutations: {
         RECEIVE_ADDRESS(state, { address }) {
@@ -59,6 +60,9 @@ export default new Vuex.Store({
         },
         RESET_USER_INFO(state) {
             state.userInfo = {}
+        },
+        RECEIVE_SEARCH_SHOPS(state,{searchShops}) {
+            state.searchShops = searchShops
         },
     },
     actions: {
@@ -138,6 +142,14 @@ export default new Vuex.Store({
                 console.log(userInfo)
                 /* 将用户信息保存到vuex中 */
                 commit('RECEIVE_USER_INFO', {userInfo})
+            }
+        },
+        async searchShops({ commit, state },keyword) {
+            const geohash = state.latitude + ',' + state.longitude
+            const result = await reqSearchShop(geohash, keyword)
+            if (result.code === 0) {
+                const searchShops = result.data
+                commit('RECEIVE_SEARCH_SHOPS',{searchShops})
             }
         },
     },
